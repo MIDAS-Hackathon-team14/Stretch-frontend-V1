@@ -3,7 +3,7 @@ import { WorkInfo } from "../../../lib/export/data";
 import PlanModal from "../../common/PlanModal";
 import Schedule from "../../common/Schedule";
 import SideBar from "../../common/Sidebar";
-// import WorkModal from "../../common/WorkModal";
+import UpdateModal from "../../common/UpdateModal";
 import WorkModal from "../../common/WorkModal";
 
 const MainPage = () => {
@@ -39,6 +39,7 @@ const MainPage = () => {
       </MainDiv>
       {/* <PlanModal /> */}
       {/* <WorkModal /> */}
+      {/* <UpdateModal /> */}
     </>
   );
 };
