@@ -4,15 +4,15 @@ import styled from "styled-components";
 import axios from "axios";
 
 const instance = axios.create({
-  baseURL : 'http://52.55.240.35:8080/',
-  headers : {
-    "Content-Type" : "application/json"
-  }
-})
+  baseURL: "http://52.55.240.35:8080/",
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
 const SignUp = () => {
   const [data, setData] = useState({
-    name : "",
+    name: "",
     email: "",
     password: "",
   });
@@ -47,18 +47,22 @@ const SignUp = () => {
     if (!Object.values(data).includes("")) {
       if (data.password === data.passwordCheck) {
         axios({
-          url : "http://52.55.240.35:8080/users",
-          method:'post',
-          data : {
-            email : data.email,
-            name : data.name,
-            password : data.password
-          }
-        }).then((res)=>{
-        sessionStorage.setItem("accessToken",res.data.acess_token);
-        })
+          url: "http://52.55.240.35:8080/users",
+          method: "post",
+          data: {
+            email: data.email,
+            name: data.name,
+            password: data.password,
+          },
+        }).then((res) => {
+          const { access_Token, refresh_Token } = res.data;
+          axios.defaults.headers.common[
+            "Authorization"
+          ] = `Bearer ${access_Token}`;
+          sessionStorage.setItem("accessToken", access_Token);
+        });
         console.log("1");
-        console.log()
+        console.log();
       } else console.log("비밀번호 확인이 틀렸습니다");
     } else console.log("내용을 입력해주세요");
   };

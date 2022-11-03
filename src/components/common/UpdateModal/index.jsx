@@ -1,29 +1,73 @@
+import axios from "axios";
+import { useEffect, useState } from "react";
 import styled, { keyframes } from "styled-components";
+import { BASE_URL } from "../../../lib/export/data";
+import guestImg from "../../../asset/image/guest.png";
+import Swal from "sweetalert2";
 
 const UpdateModal = () => {
+  const [user, setUser] = useState({ name: "", email: "" });
+  useEffect(() => {
+    axios({
+      url: BASE_URL + "/users",
+      method: "get",
+      headers: {
+        Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+      },
+    }).then((res) => {
+      setUser(res.data);
+    });
+  }, []);
+
+  const changeInput = (e, props) => {
+    setUser({ ...user, [props]: e.target.value });
+  };
+
+  const submit = () => {
+    axios({
+      url: BASE_URL + "/admin/user/6",
+      method: "patch",
+      data: user,
+      headers: {
+        Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+      },
+    }).then((res) => {
+      Swal.fire({
+        title: "성공",
+        icon: "success",
+        confirmButtonText: "Ok",
+      }).then((result) => {
+        window.location.reload();
+      });
+    });
+  };
   return (
     <>
       <MainDiv>
         <Profile>
-          <img src="" alt="" />
+          <img src={guestImg} alt="" />
         </Profile>
         <InputContainer>
           <Input width={200}>
-            <input placeholder="김코사" />
-            <hr />
-          </Input>
-          <Input width={200}>
-            <input placeholder="부장" />
+            <input
+              placeholder={user.name}
+              onChange={(e) => changeInput(e, "name")}
+            />
             <hr />
           </Input>
           <Input width={500}>
-            <input placeholder="ldh7228@gmail.com" />
+            <input
+              placeholder={user.email}
+              onChange={(e) => changeInput(e, "email")}
+            />
             <hr />
           </Input>
         </InputContainer>
         <BtnContainer>
           <SubmitBtn color="#616161">취소하기</SubmitBtn>
-          <SubmitBtn color="#5BCA7E">수정하기</SubmitBtn>
+          <SubmitBtn color="#5BCA7E" onClick={() => submit()}>
+            수정하기
+          </SubmitBtn>
         </BtnContainer>
       </MainDiv>
     </>

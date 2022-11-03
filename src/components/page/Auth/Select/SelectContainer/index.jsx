@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 const SelectContainer = (props) => {
@@ -10,8 +11,18 @@ const SelectContainer = (props) => {
         </Profile>
         <hr />
         <Title>{title}</Title>
-        <Description>{description}</Description>
-        <SubmitBtn>이동하기</SubmitBtn>
+        <Description>{description}</Description>{" "}
+        <SubmitBtn>
+          <a
+            href={
+              title === "직원으로 소속되기"
+                ? "http://localhost:3000/encode"
+                : "http://localhost:3000/mkcom"
+            }
+          >
+            이동하기
+          </a>{" "}
+        </SubmitBtn>
       </MainDiv>
     </>
   );
