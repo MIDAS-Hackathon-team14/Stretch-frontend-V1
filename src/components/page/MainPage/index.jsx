@@ -1,7 +1,10 @@
 import styled, { keyframes } from "styled-components";
 import { WorkInfo } from "../../../lib/export/data";
+import PlanModal from "../../common/PlanModal";
 import Schedule from "../../common/Schedule";
 import SideBar from "../../common/Sidebar";
+// import WorkModal from "../../common/WorkModal";
+import WorkModal from "../../common/WorkModal";
 
 const MainPage = () => {
   return (
@@ -24,9 +27,9 @@ const MainPage = () => {
             <div>
               <Gauge height={parseInt(WorkInfo.record_sum / 60) * 1.75}>
                 <div></div>
-                <span>{parseInt(WorkInfo.record_sum / 60)}</span>
+                <span>{parseInt(WorkInfo.record_sum / 60)}h</span>
                 <hr />
-                <span>40</span>
+                <span>40h</span>
               </Gauge>
               <SubmitBtn>출근</SubmitBtn>
             </div>
@@ -34,6 +37,8 @@ const MainPage = () => {
           <Schedule />
         </Container>
       </MainDiv>
+      {/* <PlanModal /> */}
+      {/* <WorkModal /> */}
     </>
   );
 };
@@ -98,7 +103,7 @@ const Gauge = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 18px;
+  font-size: 15px;
   border: 1px solid #101010;
   border-radius: 4px;
 
