@@ -2,7 +2,6 @@ import { createGlobalStyle } from "styled-components";
 
 const GlobalStyle = createGlobalStyle`
   * {
-    border: none;
     outline: none;
     font-family: 'SpoqaHanSansNeo-Regular';
   }
