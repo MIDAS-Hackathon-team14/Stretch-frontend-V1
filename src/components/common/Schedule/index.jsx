@@ -1,17 +1,21 @@
+import { WorkInfo } from "../../../lib/export/data";
 import styled, { keyframes } from "styled-components";
 import vacationImage from "../../../asset/image/plane.png";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { settingPlan, settingUpdate } from "../../../store/setPlan";
 import { BASE_URL } from "../../../lib/export/data";
-import { WorkInfo } from "../../../lib/export/data";
 
-const Schedule = (props) => {
+const Schedule = () => {
   const week = ["월", "화", "수", "목", "금", "토", "일"];
-  const { work } = props;
-  console.log(props)
+  const [work, setWork] = useState(WorkInfo);
+  const [workbool, setWorkbool] = useState(false);
+  const dispatch = useDispatch();
+
   const getTime = (str, plan, index) => {
     return parseInt(
-      work.week_plan[str][plan].substring(11, 16).split(":")[index]
+      String(WorkInfo.week_plan[str][plan]).substring(11, 16).split(":")[index]
     );
   };
 
@@ -19,66 +23,84 @@ const Schedule = (props) => {
     return getTime(str, plan, 0) * 60 + getTime(str, plan, 1);
   };
 
+  useEffect(() => {
+    axios({
+      url: BASE_URL + "/employees/work/info",
+      method: "get",
+      headers: {
+        Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+      },
+    }).then((res) => {
+      setWork(res.data);
+    });
+  });
+
   return (
     <ScheduleDiv>
       <span>근무 일정</span>
       <Table>
-        <></>
         {week.map((str, i) => (
           <>
-            <div>
-              <ScheduleText right={34}>
-                {work.week_plan[i].date.substring(5).replace("-", "/")}
-              </ScheduleText>
-              <ScheduleText
-                right={63}
-                color={
-                  str === "토" ? "#0C43B7" : str === "일" ? "#E63E70" : "#000"
-                }
-              >
-                {str}
-              </ScheduleText>
-              <Graph>
-                {work.week_plan.place &&
-                work.week_plan[i].is_planed !== false ? (
-                  <>
-                    {work.week_plan[i].out_of_office_type !== "휴가" ? (
+            {i > -1 ? (
+              <>
+                <div
+                  onClick={() => {
+                    dispatch(settingUpdate(true));
+                  }}
+                >
+                  <ScheduleText right={34}>
+                    {work.week_plan[i].date.substring(5).replace("-", "/")}
+                  </ScheduleText>
+                  <ScheduleText
+                    right={63}
+                    color={
+                      str === "토"
+                        ? "#0C43B7"
+                        : str === "일"
+                        ? "#E63E70"
+                        : "#000"
+                    }
+                  >
+                    {str}
+                  </ScheduleText>
+                  <Graph>
+                    {work.week_plan[i].is_planed !== false ? (
                       <>
-                        <GraphBar
-                          delay={0}
-                          width={
-                            (getGraphWidth(i, "plan_end") -
-                              getGraphWidth(i, "plan_start")) *
-                            0.45
-                          }
-                          left={getGraphWidth(i, "plan_start") * 0.45}
-                          color="rgba(91, 202, 126, 0.4)"
-                        />
-                        <GraphBar
-                          delay={1}
-                          width={
-                            (getGraphWidth(i, "record_end") -
-                              getGraphWidth(i, "record_start")) *
-                            0.45
-                          }
-                          left={getGraphWidth(i, "record_start") * 0.45}
-                          color={
-                            work.week_plan[i].out_of_office_type === "출장"
-                              ? "rgb(236, 122, 136)"
-                              : "rgba(91, 202, 126, 0.7)"
-                          }
-                        />
+                        {work.week_plan[i].out_of_office_type !== "휴가" ? (
+                          <>
+                            <GraphBar
+                              delay={0}
+                              width={
+                                (getGraphWidth(i, "plan_end") -
+                                  getGraphWidth(i, "plan_start")) *
+                                0.45
+                              }
+                              left={getGraphWidth(i, "plan_start") * 0.45}
+                              color="rgba(91, 202, 126, 0.4)"
+                            />
+                            <GraphBar
+                              delay={1}
+                              width={
+                                (getGraphWidth(i, "record_end") -
+                                  getGraphWidth(i, "record_start")) *
+                                0.45
+                              }
+                              left={getGraphWidth(i, "record_start") * 0.45}
+                              color={
+                                work.week_plan[i].out_of_office_type === "출장"
+                                  ? "rgb(236, 122, 136)"
+                                  : "rgba(91, 202, 126, 0.7)"
+                              }
+                            />
+                          </>
+                        ) : (
+                          <></>
+                        )}
                       </>
                     ) : (
                       <></>
                     )}
-                  </>
-                ) : (
-                  <></>
-                )}
-              </Graph>
-              {work.week_plan.out_of_office_type ? (
-                <>
+                  </Graph>
                   {work.week_plan[i].out_of_office_type !== "휴가" ? (
                     <>
                       <ScheduleText left={30}>
@@ -174,11 +196,25 @@ const Schedule = (props) => {
                       <ScheduleText color={"#0740B8"}>휴가</ScheduleText>
                     </>
                   )}
-                </>
-              ) : (
-                <></>
-              )}
-            </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <ScheduleText right={34}>
+                  {work.week_plan[i].date.substring(5).replace("-", "/")}
+                </ScheduleText>
+                <ScheduleText
+                  right={63}
+                  color={
+                    str === "토" ? "#0C43B7" : str === "일" ? "#E63E70" : "#000"
+                  }
+                >
+                  {str}
+                </ScheduleText>
+                <Graph style={{ position: "absolute" }}></Graph>
+              </>
+            )}
+
             {i !== week.length - 1 ? <hr /> : <></>}
           </>
         ))}
