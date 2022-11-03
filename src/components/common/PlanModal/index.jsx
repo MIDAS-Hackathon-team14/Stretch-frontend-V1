@@ -1,20 +1,78 @@
+import axios from "axios";
+import { useState } from "react";
 import styled, { keyframes } from "styled-components";
 import CalendarImg from "../../../asset/image/calendar.png";
+import { BASE_URL } from "../../../lib/export/data";
+import { settingPlan } from "../../../store/setPlan";
+import { useDispatch, useSelector } from "react-redux";
+import Swal from "sweetalert2";
 
 const PlanModal = () => {
   const work = ["근무", "외근", "출장", "휴가"];
   const pos = ["회사", "재택", "스마트 워크"];
 
+  const dispatch = useDispatch();
+  const planBool = useSelector((state) => state.plan.setPlan);
+  const [data, setData] = useState({
+    is_out_of_office: false,
+    place: "COMPANY",
+    // plan_start: "2022-07-18T09:12:00",
+    // plan_end: "2022-07-18T18:12:00",
+  });
+  const [plan, setPlan] = useState({
+    date1: "",
+    date2: "",
+    time1: "",
+    time2: "",
+    time3: "",
+    time4: "",
+  });
+  const submit = () => {
+    console.log({
+      is_out_of_office: data.is_out_of_office,
+      place: data.place,
+      out_of_office_type: null,
+      plan_start: plan.date1 + "T" + plan.time1 + ":" + plan.time2 + ":00",
+      plan_end: plan.date2 + "T" + plan.time3 + ":" + plan.time4 + ":00",
+    });
+    axios({
+      url: BASE_URL + "/employees/work/plan",
+      method: "post",
+      headers: {
+        Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+      },
+      data: {
+        is_out_of_office: data.is_out_of_office,
+        place: data.place,
+        out_of_office_type: null,
+        plan_start: plan.date1 + "T" + plan.time1 + ":" + plan.time2 + ":00",
+        plan_end: plan.date2 + "T" + plan.time3 + ":" + plan.time4 + ":00",
+      },
+    }).then((res) => {
+      Swal.fire({
+        title: "성공",
+        icon: "success",
+        confirmButtonText: "Ok",
+      }).then((result) => {
+        dispatch(settingPlan(!planBool));
+      });
+    });
+  };
   return (
     <>
       <MainDiv>
         <Title>계획하기</Title>
         <Day>11/01 (화)</Day>
         <Container padding={75}>
-          {work.map((str) => (
+          {work.map((str, i) => (
             <div>
               <CheckInputDiv>
-                <CheckInput type={"checkbox"} />
+                <CheckInput
+                  type={"checkbox"}
+                  onClick={() => {
+                    setData({ ...data, is_out_of_office: false });
+                  }}
+                />
                 <span>{str}</span>
               </CheckInputDiv>
             </div>
@@ -25,7 +83,10 @@ const PlanModal = () => {
           {pos.map((str) => (
             <div>
               <CheckInputDiv>
-                <CheckInput type={"checkbox"} />
+                <CheckInput
+                  type={"checkbox"}
+                  onClick={() => setData({ ...data, place: "COMPANY" })}
+                />
                 <span>{str}</span>
               </CheckInputDiv>
             </div>
@@ -35,27 +96,66 @@ const PlanModal = () => {
         <Container padding={42}>
           <TimeContainer>
             <InputDate>
-              <input type="date" />
+              <input
+                type="date"
+                onChange={(e) => {
+                  setPlan({ ...plan, date1: e.target.value });
+                }}
+              />
             </InputDate>
-            <InputTime type={"number"} />
+            <InputTime
+              type={"number"}
+              onChange={(e) => {
+                setPlan({ ...plan, time1: e.target.value });
+              }}
+            />
             <span>:</span>
-            <InputTime type={"text"} />
+            <InputTime
+              type={"number"}
+              onChange={(e) => {
+                setPlan({ ...plan, time2: e.target.value });
+              }}
+            />
           </TimeContainer>
         </Container>
         <WidthHr />
         <Container padding={42}>
           <TimeContainer>
             <InputDate>
-              <input type="date" />
+              <input
+                type="date"
+                onChange={(e) => {
+                  setPlan({ ...plan, date2: e.target.value });
+                }}
+              />
             </InputDate>
-            <InputTime type={"number"} />
+            <InputTime
+              type={"number"}
+              onChange={(e) => {
+                setPlan({ ...plan, time3: e.target.value });
+              }}
+            />
             <span>:</span>
-            <InputTime type={"text"} />
+            <InputTime
+              type={"number"}
+              onChange={(e) => {
+                setPlan({ ...plan, time4: e.target.value });
+              }}
+            />
           </TimeContainer>
         </Container>
         <BtnContainer>
-          <SubmitBtn color="#616161">취소</SubmitBtn>
-          <SubmitBtn color="#5BCA7E">완료</SubmitBtn>
+          <SubmitBtn
+            color="#616161"
+            onClick={() => {
+              dispatch(settingPlan(!planBool));
+            }}
+          >
+            취소
+          </SubmitBtn>
+          <SubmitBtn color="#5BCA7E" onClick={() => submit()}>
+            완료
+          </SubmitBtn>
         </BtnContainer>
       </MainDiv>
     </>
