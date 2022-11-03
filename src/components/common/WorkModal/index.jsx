@@ -1,19 +1,49 @@
+import axios from "axios";
+import { useEffect, useState } from "react";
 import styled, { keyframes } from "styled-components";
+import { BASE_URL, WorkInfo } from "../../../lib/export/data";
 
 const WorkModal = () => {
+  const [work, setWork] = useState(WorkInfo);
+  useEffect(() => {
+    axios({
+      url: BASE_URL + "/employees/work/info",
+      method: "get",
+      headers: {
+        Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+      },
+    }).then((res) => {
+      setWork(res.data.week_plan[4]);
+    });
+  });
+
+  const getTime = (str, plan, index) => {
+    return parseInt(
+      String(WorkInfo.week_plan[str][plan]).substring(11, 16).split(":")[index]
+    );
+  };
   return (
     <>
       <MainDiv>
-        <Day>11/01 (화)</Day>
+        <Day>11/04 (금)</Day>
         <WorkText left={43}>계획한 근무 시간</WorkText>
         <TimeContainer>
-          <div>09:00-18:00</div>
-          <div>08:00</div>
+          <div>
+            {String(work.plan_start).substring(11, 16)}-
+            {String(work.plan_end).substring(11, 16)}
+          </div>
+          <div>
+            {parseInt(String(work.plan_end).substring(11, 16)) -
+              parseInt(String(work.plan_start).substring(11, 16))}
+          </div>
         </TimeContainer>
-        <WorkText left={43}>계획한 근무 시간</WorkText>
+        <WorkText left={43}>근무 시간</WorkText>
         <TimeContainer>
-          <div>09:00-18:00</div>
-          <div>08:00</div>
+          <div>
+            {String(work.record_start).substring(11, 16)}-
+            {String(work.record_end).substring(11, 16)}
+          </div>
+          <div>{parseInt(String(work.plan_start).substring(11, 16)) - 3}</div>
         </TimeContainer>
         <WorkText left={43}>
           8시간 기준{" "}
@@ -23,7 +53,9 @@ const WorkModal = () => {
           근무하셨습니다
         </WorkText>
         <Graph>
-          <GraphBar width={300} />
+          <GraphBar
+            width={parseInt(String(work.plan_start).substring(11, 16)) * 60}
+          />
         </Graph>
         <SubmitBtn>
           <button>확인</button>
