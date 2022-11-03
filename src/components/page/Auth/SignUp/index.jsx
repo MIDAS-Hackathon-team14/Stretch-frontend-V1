@@ -182,8 +182,8 @@ const Input = styled.div`
 `;
 
 const CheckInputDiv = styled.span`
-  width: 14px;
-  height: 14px;
+  width: 15px;
+  height: 15px;
   position: relative;
   border: 1.5px solid #9b9ea0;
   margin: 25px 0px 0px 5px;
@@ -209,11 +209,11 @@ const HighlightText = styled.span`
 const CheckInput = styled.input`
   position: absolute;
   top: -3px;
-  left: -4px;
+  left: -5px;
   cursor: pointer;
   appearance: none;
-  width: 15px;
-  height: 15px;
+  width: 13px;
+  height: 13px;
   border: 1px solid #fff;
 
   :checked {
