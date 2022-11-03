@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 const Login = () => {
   const [data, setData] = useState({
@@ -28,15 +29,27 @@ const Login = () => {
   const submit = () => {
     if (!Object.values(data).includes("")) {
       axios({
-        method:'post',
-        url : "http://52.55.240.35:8080/users/auth",
-        data : {
-          email : data.email,
-          password : data.password
-        }
+        method: "post",
+        url: "http://52.55.240.35:8080/users/auth",
+        data: {
+          email: data.email,
+          password: data.password,
+        },
       }).then((res) => {
-        sessionStorage.setItem("accessToken",res.data.acess_token);
-      })
+        const { access_token, refresh_token } = res.data;
+        console.log(res.data);
+        axios.defaults.headers.common[
+          "Authorization"
+        ] = `Bearer ${access_token}`;
+        sessionStorage.setItem("accessToken", access_token);
+        Swal.fire({
+          title: "성공",
+          icon: "success",
+          confirmButtonText: "Ok",
+        }).then((result) => {
+          window.location.href = "select";
+        });
+      });
     } else alert("내용을 입력해주세요");
   };
   return (
