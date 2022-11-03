@@ -1,13 +1,17 @@
-import { WorkInfo } from "../../../lib/export/data";
 import styled, { keyframes } from "styled-components";
 import vacationImage from "../../../asset/image/plane.png";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { BASE_URL } from "../../../lib/export/data";
+import { WorkInfo } from "../../../lib/export/data";
 
-const Schedule = () => {
+const Schedule = (props) => {
   const week = ["월", "화", "수", "목", "금", "토", "일"];
-
+  const { work } = props;
+  console.log(props)
   const getTime = (str, plan, index) => {
     return parseInt(
-      WorkInfo.week_plan[str][plan].substring(11, 16).split(":")[index]
+      work.week_plan[str][plan].substring(11, 16).split(":")[index]
     );
   };
 
@@ -19,11 +23,12 @@ const Schedule = () => {
     <ScheduleDiv>
       <span>근무 일정</span>
       <Table>
+        <></>
         {week.map((str, i) => (
           <>
             <div>
               <ScheduleText right={34}>
-                {WorkInfo.week_plan[i].date.substring(5).replace("-", "/")}
+                {work.week_plan[i].date.substring(5).replace("-", "/")}
               </ScheduleText>
               <ScheduleText
                 right={63}
@@ -34,9 +39,10 @@ const Schedule = () => {
                 {str}
               </ScheduleText>
               <Graph>
-                {WorkInfo.week_plan[i].is_planed !== false ? (
+                {work.week_plan.place &&
+                work.week_plan[i].is_planed !== false ? (
                   <>
-                    {WorkInfo.week_plan[i].out_of_office_type !== "휴가" ? (
+                    {work.week_plan[i].out_of_office_type !== "휴가" ? (
                       <>
                         <GraphBar
                           delay={0}
@@ -57,7 +63,7 @@ const Schedule = () => {
                           }
                           left={getGraphWidth(i, "record_start") * 0.45}
                           color={
-                            WorkInfo.week_plan[i].out_of_office_type === "출장"
+                            work.week_plan[i].out_of_office_type === "출장"
                               ? "rgb(236, 122, 136)"
                               : "rgba(91, 202, 126, 0.7)"
                           }
@@ -71,100 +77,106 @@ const Schedule = () => {
                   <></>
                 )}
               </Graph>
-              {WorkInfo.week_plan[i].out_of_office_type !== "휴가" ? (
+              {work.week_plan.out_of_office_type ? (
                 <>
-                  <ScheduleText left={30}>
-                    {!WorkInfo.week_plan[i].is_out_of_office ? (
-                      <>
-                        <div>
-                          {WorkInfo.week_plan[i].is_planed !== false ? (
-                            <>
-                              {WorkInfo.week_plan[i].record_start ? (
-                                <ScheduleText>
-                                  {WorkInfo.week_plan[i].record_start.substring(
-                                    11,
-                                    16
-                                  )}{" "}
-                                  출근
-                                </ScheduleText>
-                              ) : (
-                                <ScheduleText color={"#828282"}>
-                                  {WorkInfo.week_plan[i].plan_start.substring(
-                                    11,
-                                    16
-                                  )}{" "}
-                                  출근
-                                </ScheduleText>
-                              )}
-                            </>
-                          ) : (
-                            <></>
-                          )}
-                        </div>
-                        <div>
-                          {WorkInfo.week_plan[i].is_planed !== false ? (
-                            <>
-                              {WorkInfo.week_plan[i].record_end ? (
-                                <ScheduleText>
-                                  {WorkInfo.week_plan[i].record_end.substring(
-                                    11,
-                                    16
-                                  )}{" "}
-                                  퇴근
-                                </ScheduleText>
-                              ) : (
-                                <ScheduleText color={"#828282"}>
-                                  {WorkInfo.week_plan[i].plan_end.substring(
-                                    11,
-                                    16
-                                  )}{" "}
-                                  퇴근
-                                </ScheduleText>
-                              )}
-                            </>
-                          ) : (
-                            <></>
-                          )}
-                        </div>
-                      </>
-                    ) : (
-                      <ScheduleText left={25} right={25} color={"#DA2C61"}>
-                        출장
-                      </ScheduleText>
-                    )}
-                  </ScheduleText>
-                  <ScheduleText left={44} width={100}>
-                    <span>
-                      <span>
-                        {WorkInfo.week_plan[i].is_planed !== false ? (
+                  {work.week_plan[i].out_of_office_type !== "휴가" ? (
+                    <>
+                      <ScheduleText left={30}>
+                        {!work.week_plan[i].is_out_of_office ? (
                           <>
-                            {String(
-                              parseInt(
-                                (getGraphWidth(i, "record_end") -
-                                  getGraphWidth(i, "record_start")) /
-                                  60
-                              )
-                            ).padStart(2, "0")}
-                            :
-                            {String(
-                              (getGraphWidth(i, "record_end") -
-                                getGraphWidth(i, "record_start")) %
-                                60
-                            ).padStart(2, "0")}
+                            <div>
+                              {work.week_plan[i].is_planed !== false ? (
+                                <>
+                                  {work.week_plan[i].record_start ? (
+                                    <ScheduleText>
+                                      {work.week_plan[i].record_start.substring(
+                                        11,
+                                        16
+                                      )}{" "}
+                                      출근
+                                    </ScheduleText>
+                                  ) : (
+                                    <ScheduleText color={"#828282"}>
+                                      {work.week_plan[i].plan_start.substring(
+                                        11,
+                                        16
+                                      )}{" "}
+                                      출근
+                                    </ScheduleText>
+                                  )}
+                                </>
+                              ) : (
+                                <></>
+                              )}
+                            </div>
+                            <div>
+                              {work.week_plan[i].is_planed !== false ? (
+                                <>
+                                  {work.week_plan[i].record_end ? (
+                                    <ScheduleText>
+                                      {work.week_plan[i].record_end.substring(
+                                        11,
+                                        16
+                                      )}{" "}
+                                      퇴근
+                                    </ScheduleText>
+                                  ) : (
+                                    <ScheduleText color={"#828282"}>
+                                      {work.week_plan[i].plan_end.substring(
+                                        11,
+                                        16
+                                      )}{" "}
+                                      퇴근
+                                    </ScheduleText>
+                                  )}
+                                </>
+                              ) : (
+                                <></>
+                              )}
+                            </div>
                           </>
                         ) : (
-                          <></>
+                          <ScheduleText left={25} right={25} color={"#DA2C61"}>
+                            출장
+                          </ScheduleText>
                         )}
-                      </span>
-                      <span>{WorkInfo.week_plan[i].place}</span>
-                    </span>
-                  </ScheduleText>
+                      </ScheduleText>
+                      <ScheduleText left={44} width={100}>
+                        <span>
+                          <span>
+                            {work.week_plan[i].is_planed !== false ? (
+                              <>
+                                {String(
+                                  parseInt(
+                                    (getGraphWidth(i, "record_end") -
+                                      getGraphWidth(i, "record_start")) /
+                                      60
+                                  )
+                                ).padStart(2, "0")}
+                                :
+                                {String(
+                                  (getGraphWidth(i, "record_end") -
+                                    getGraphWidth(i, "record_start")) %
+                                    60
+                                ).padStart(2, "0")}
+                              </>
+                            ) : (
+                              <></>
+                            )}
+                          </span>
+                          <span>{work.week_plan[i].place}</span>
+                        </span>
+                      </ScheduleText>
+                    </>
+                  ) : (
+                    <>
+                      <VacationEmoji src={vacationImage} alt="" />
+                      <ScheduleText color={"#0740B8"}>휴가</ScheduleText>
+                    </>
+                  )}
                 </>
               ) : (
-                <>
-                  <VacationEmoji src={vacationImage} alt="" />
-                  <ScheduleText color={"#0740B8"}>휴가</ScheduleText>
-                </>
+                <></>
               )}
             </div>
             {i !== week.length - 1 ? <hr /> : <></>}
