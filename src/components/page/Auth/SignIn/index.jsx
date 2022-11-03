@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import axios from "axios";
 
 const Login = () => {
   const [data, setData] = useState({
@@ -26,8 +27,17 @@ const Login = () => {
 
   const submit = () => {
     if (!Object.values(data).includes("")) {
-      // axios
-    } else console.log("내용을 입력해주세요");
+      axios({
+        method:'post',
+        url : "http://52.55.240.35:8080/users/auth",
+        data : {
+          email : data.email,
+          password : data.password
+        }
+      }).then((res) => {
+        sessionStorage.setItem("accessToken",res.data.acess_token);
+      })
+    } else alert("내용을 입력해주세요");
   };
   return (
     <>
