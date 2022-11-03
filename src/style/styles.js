@@ -4,6 +4,7 @@ const GlobalStyle = createGlobalStyle`
   * {
     outline: none;
     font-family: 'SpoqaHanSansNeo-Regular';
+    box-sizing: border-box;
   }
 
   body, html { // 드래그 방지
