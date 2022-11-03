@@ -113,7 +113,7 @@ const Gauge = styled.div`
     }
     background-color: #04cf5c;
     width: 100%;
-    animation: ${(props) => GaugeAnimation(props.height)} 0.5s ease-in-out;
+    animation: ${(props) => GaugeAnimation(props.height)} 1s ease-in-out;
     animation-fill-mode: forwards;
     position: absolute;
     bottom: 0;
