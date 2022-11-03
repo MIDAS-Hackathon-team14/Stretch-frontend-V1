@@ -1,12 +1,69 @@
+import axios from "axios";
+import { useEffect, useState } from "react";
 import styled, { keyframes } from "styled-components";
-import { WorkInfo } from "../../../lib/export/data";
-import PlanModal from "../../common/PlanModal";
+import { BASE_URL, WorkInfo } from "../../../lib/export/data";
 import Schedule from "../../common/Schedule";
 import SideBar from "../../common/Sidebar";
+import PlanModal from "../../common/PlanModal";
 import UpdateModal from "../../common/UpdateModal";
 import WorkModal from "../../common/WorkModal";
+import guestImg from "../../../asset/image/guest.png";
+import { useSelector, useDispatch } from "react-redux";
+import { settingUpdate } from "../../../store/setPlan";
+import Swal from "sweetalert2";
 
 const MainPage = () => {
+  const dispatch = new useDispatch();
+  const plan = useSelector((state) => state.plan.setPlan);
+  const admin = false;
+  const [update, setUpdate] = useState(false);
+  const [work, setWork] = useState(WorkInfo);
+
+  const [user, setUser] = useState({ name: "", email: "" });
+
+  useEffect(() => {
+    axios({
+      url: BASE_URL + "/users",
+      method: "get",
+      headers: {
+        Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+      },
+    }).then((res) => {
+      console.log(res.data);
+      setUser(res.data);
+    });
+  }, []);
+
+  useEffect(() => {
+    axios({
+      url: BASE_URL + "/employees/work/info",
+      method: "get",
+      headers: {
+        Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+      },
+    }).then((res) => {
+      setWork(res.data);
+    });
+  }, [setWork]);
+
+  const onWork = () => {
+    axios({
+      url: BASE_URL + "/employees/work/go",
+      method: "post",
+      headers: {
+        Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+      },
+    }).then((res) => {
+      Swal.fire({
+        title: "성공",
+        icon: "success",
+        confirmButtonText: "Ok",
+      }).then((result) => {
+        window.location.reload();
+      });
+    });
+  };
+
   return (
     <>
       <MainDiv>
@@ -14,32 +71,45 @@ const MainPage = () => {
         <Container>
           <Profile>
             <div>
-              <img src="" alt="" />
+              <img src={guestImg} alt="" />
               <ProfileInfo>
                 <ProfileText size={24} weight={700}>
-                  김코사
+                  {user.name}
                 </ProfileText>
-                <ProfileText size={18} weight={400}>
-                  부장
-                </ProfileText>
+                {admin ? (
+                  <ProfileText size={18} weight={400}>
+                    {user.email}
+                  </ProfileText>
+                ) : (
+                  <ProfileText
+                    style={{ cursor: "pointer" }}
+                    size={18}
+                    weight={400}
+                    onClick={() => {
+                      setUpdate(!update);
+                    }}
+                  >
+                    수정하기
+                  </ProfileText>
+                )}
               </ProfileInfo>
             </div>
             <div>
-              <Gauge height={parseInt(WorkInfo.record_sum / 60) * 1.75}>
+              <Gauge height={parseInt(work.record_sum / 60) * 1.75}>
                 <div></div>
-                <span>{parseInt(WorkInfo.record_sum / 60)}h</span>
+                <span>{parseInt(work.record_sum / 60)}h</span>
                 <hr />
                 <span>40h</span>
               </Gauge>
-              <SubmitBtn>출근</SubmitBtn>
+              <SubmitBtn onClick={() => onWork()}>출근</SubmitBtn>
             </div>
           </Profile>
-          <Schedule />
+          <Schedule work={work} />
         </Container>
       </MainDiv>
-      {/* <PlanModal /> */}
+      {plan ? <PlanModal /> : <></>}
+      {update ? <UpdateModal /> : <></>}
       {/* <WorkModal /> */}
-      {/* <UpdateModal /> */}
     </>
   );
 };
