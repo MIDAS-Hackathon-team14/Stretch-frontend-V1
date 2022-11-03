@@ -49,7 +49,7 @@ const Schedule = () => {
                           color="rgba(91, 202, 126, 0.4)"
                         />
                         <GraphBar
-                          delay={0.5}
+                          delay={1}
                           width={
                             (getGraphWidth(i, "record_end") -
                               getGraphWidth(i, "record_start")) *
@@ -263,7 +263,7 @@ const GraphBar = styled.div`
   height: 100%;
   margin-left: ${(props) => props.left}px;
   background-color: ${(props) => props.color};
-  animation: ${(props) => animationGraph(props.width)} 0.5s ease-in-out;
+  animation: ${(props) => animationGraph(props.width)} 1s ease-in-out;
   animation-delay: ${(props) => props.delay}s;
   animation-fill-mode: forwards;
 
