@@ -1,6 +1,23 @@
+import axios from "axios";
+import { useEffect, useState } from "react";
 import styled, { keyframes } from "styled-components";
+import { BASE_URL } from "../../../../lib/export/data";
 
 const InviteCode = () => {
+  const [code, setCode] = useState("");
+  useEffect(() => {
+    console.log("asd");
+    axios({
+      url: BASE_URL + "/companys/invite",
+      method: "get",
+      headers: {
+        Authorization: `Bearer ${sessionStorage.getItem("accessToken")}`,
+      },
+    }).then((res) => {
+      setCode(res.data.code);
+    });
+  }, []);
+
   return (
     <>
       <MainDiv>
@@ -8,7 +25,7 @@ const InviteCode = () => {
           <CenterTitle>회사가 성공적으로 생성되었습니다!✔️</CenterTitle>
           <CenterSubTitle>회사 초대 코드</CenterSubTitle>
           <CodeContainer>
-            <Code>asdmcasdlska</Code>
+            <Code>{code}</Code>
           </CodeContainer>
         </CenterDiv>
       </MainDiv>
